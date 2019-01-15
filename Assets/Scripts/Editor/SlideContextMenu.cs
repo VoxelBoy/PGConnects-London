@@ -8,6 +8,9 @@ public class SlideContextMenu
     private static void GatherTextElements(MenuCommand menuCommand)
     {
         var slide = menuCommand.context as Slide;
-        slide.Elements = slide.GetComponentsInChildren<TextMeshProUGUI>().ToList().ConvertAll(x => x.gameObject);
+        slide.Elements = slide.GetComponentsInChildren<TextMeshProUGUI>()
+                            .Where(x => x.gameObject.name != "Title")
+                            .Select(x => x.gameObject)
+                            .ToList();
     }
 }
