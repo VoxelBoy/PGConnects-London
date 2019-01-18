@@ -539,7 +539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f3e34fb39b85034593d5b2d87ed58db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slideIndex: 5
+  slideIndex: 0
   slides:
   - {fileID: 2145140564}
   - {fileID: 1927984924}
@@ -2858,7 +2858,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1528066832298684, guid: 17e71a5a340a76c42bd79533f8a1fbde, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1987046681810526, guid: 17e71a5a340a76c42bd79533f8a1fbde, type: 3}
       propertyPath: m_IsActive
@@ -4809,23 +4809,6 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1927984920}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1927984923
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1927984921}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 786012ac8930f4c94a7068870e612c65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  whatToggle: {fileID: 0}
-  howToggle: {fileID: 0}
-  whatToggleOnContent: {fileID: 0}
-  bothTogglesOnContent: {fileID: 0}
-  bothTogglesOffContent: {fileID: 0}
 --- !u!114 &1927984924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5077,7 +5060,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1528066832298684, guid: 17e71a5a340a76c42bd79533f8a1fbde, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114911591472400092, guid: 17e71a5a340a76c42bd79533f8a1fbde,
         type: 3}

@@ -3,27 +3,28 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
-  m_Name: CALIBRI SDF Shadow
+  m_Name: CALIBRI SDF
   m_EditorClassIdentifier: 
-  hashCode: 766746857
+  hashCode: -129672657
   material: {fileID: 21887531477123142}
   materialHashCode: 1087365828
   fontAssetType: 1
   m_fontInfo:
     Name: Calibri
     PointSize: 43
-    Scale: 0
+    Scale: 1
     CharacterCount: 250
     LineHeight: 52.5
     Baseline: 0
     Ascender: 32.25
-    CapHeight: 0
+    CapHeight: 27.3125
     Descender: -10.75
     CenterLine: 0
     SuperscriptOffset: 32.25
@@ -33,19 +34,19 @@ MonoBehaviour:
     UnderlineThickness: 2.8134766
     strikethrough: 7.818182
     strikethroughThickness: 2.8134766
-    TabWidth: 0
+    TabWidth: 97.5
     Padding: 5
     AtlasWidth: 512
     AtlasHeight: 512
-  atlas: {fileID: 28416079833584254}
+  atlas: {fileID: 28289198154415378}
   m_glyphInfoList:
   - id: 32
     x: 6
     y: 517
-    width: 0
-    height: 0
+    width: 9.75
+    height: 43
     xOffset: 0
-    yOffset: 0
+    yOffset: 32.25
     xAdvance: 9.75
     scale: 1
   - id: 33
@@ -2354,11 +2355,12 @@ MonoBehaviour:
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: CALIBRI SDF Material
   m_Shader: {fileID: 4800000, guid: 68e6db2ebdc24f95958faec2be5558d6, type: 3}
-  m_ShaderKeywords: UNDERLAY_ON
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -2381,7 +2383,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 28416079833584254}
+        m_Texture: {fileID: 28289198154415378}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OutlineTex:
@@ -2431,8 +2433,8 @@ Material:
     - _TextureHeight: 512
     - _TextureWidth: 512
     - _UnderlayDilate: 0
-    - _UnderlayOffsetX: -1
-    - _UnderlayOffsetY: -1
+    - _UnderlayOffsetX: 0
+    - _UnderlayOffsetY: 0
     - _UnderlaySoftness: 0
     - _VertexOffsetX: 0
     - _VertexOffsetY: 0
@@ -2449,12 +2451,13 @@ Material:
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _UnderlayColor: {r: 0, g: 0, b: 0, a: 0.5}
---- !u!28 &28416079833584254
+--- !u!28 &28289198154415378
 Texture2D:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: CALIBRI SDF Shadow Atlas
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: CALIBRI SDF Atlas
   m_ImageContentsHash:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
@@ -2467,6 +2470,8 @@ Texture2D:
   m_TextureFormat: 1
   m_MipCount: 1
   m_IsReadable: 0
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
   m_AlphaIsTransparency: 0
   m_ImageCount: 1
   m_TextureDimension: 2
