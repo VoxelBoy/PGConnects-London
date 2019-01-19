@@ -159,15 +159,6 @@
             #pragma exclude_renderers d3d11_9x
             #pragma target 2.0
 
-            // -------------------------------------
-            // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
-            #pragma shader_feature _GLOSSINESS_FROM_BASE_ALPHA
-
-            //--------------------------------------
-            // GPU Instancing
-            #pragma multi_compile_instancing
-
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
 
@@ -191,15 +182,6 @@
 
             #pragma vertex DepthOnlyVertex
             #pragma fragment DepthOnlyFragment
-
-            // -------------------------------------
-            // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
-            #pragma shader_feature _GLOSSINESS_FROM_BASE_ALPHA
-
-            //--------------------------------------
-            // GPU Instancing
-            #pragma multi_compile_instancing
 
             #include "Packages/com.unity.render-pipelines.lightweight/Shaders/SimpleLitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.lightweight/Shaders/DepthOnlyPass.hlsl"
