@@ -1,4 +1,4 @@
-﻿Shader "_Custom/Legacy/LitVertexColor"
+﻿Shader "_PGC/Legacy/LitVertexColor"
 {
     Properties
     {
@@ -8,7 +8,7 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType" = "Opaque" }
 
         Pass
         {

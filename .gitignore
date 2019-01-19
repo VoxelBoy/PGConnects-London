@@ -1,8 +1,9 @@
 /Temp/*
 /Library/*
 /.idea/*
-*.csproj
-*.sln
+/Logs/*
 /obj/*
 /Assets/Plugins*
 /*DotSettings.user
+*.csproj
+*.sln

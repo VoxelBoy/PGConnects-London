@@ -1,4 +1,4 @@
-﻿Shader "_Custom/LWRP/LitVertexColor"
+﻿Shader "_PGC/LWRP/LitVertexColor"
 {
     Properties
     {
@@ -8,62 +8,141 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType" = "Opaque" "RenderPipeline" = "LightweightPipeline"}
 
         Pass
         {
-            Name "FORWARD"
-            Tags { "LightMode" = "ForwardBase" }
-            
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #pragma multi_compile_fwdbase
+            Name "ForwardLit"
+            Tags { "LightMode" = "LightweightForward" }
 
-            #include "Lighting.cginc"
-            #include "AutoLight.cginc"
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+
+            // -------------------------------------
+            // Lightweight Pipeline keywords
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+
+            #pragma vertex LitPassVertexSimple
+            #pragma fragment LitPassFragmentSimple
+            #define BUMP_SCALE_NOT_SUPPORTED 1
+
+            #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Lighting.hlsl"
             
-            fixed _AmbientContribution;
-            fixed _DiffuseContribution;
-            fixed _VertexColorContribution;
-            
-            struct VertexOutput
+            struct Attributes
             {
-                UNITY_POSITION(pos);
-                half3 normalWorld : TEXCOORD1;
-                fixed3 ambient : TEXCOORD2;
-                half4 color : COLOR;
-                LIGHTING_COORDS(3,4)
+                float4 positionOS    : POSITION;
+                float3 normalOS      : NORMAL;
+                float3 color         : COLOR;
             };
             
-            VertexOutput vert (appdata_full v)
+            struct Varyings
             {
-                VertexOutput o;
-                UNITY_INITIALIZE_OUTPUT(VertexOutput, o);
+                float3 color                    : COLOR;
+                float2 uv                       : TEXCOORD0;
+                half3 vertexSH                  : TEXCOORD1;
+                float3 posWS                    : TEXCOORD2;
             
-                float4 posWorld = mul(unity_ObjectToWorld, v.vertex);
-                o.pos = UnityObjectToClipPos(v.vertex);
-                o.normalWorld = UnityObjectToWorldNormal(v.normal);
+                half3  normal                   : TEXCOORD3;
+                half3 viewDir                   : TEXCOORD4;
             
-                o.ambient = ShadeSH9 (float4(o.normalWorld,1.0)) * _AmbientContribution;
-                o.color = v.color;
+            #ifdef _MAIN_LIGHT_SHADOWS
+                float4 shadowCoord              : TEXCOORD5;
+            #endif
+            
+                float4 positionCS               : SV_POSITION;
+            };
+            
+            struct InputDataCustom
+            {
+                float3  positionWS;
+                half3   normalWS;
+                half3   viewDirectionWS;
+                float4  shadowCoord;
+                half3   bakedGI;
+            };
+            
+            void InitializeInputData(Varyings input, out InputDataCustom inputData)
+            {
+                inputData.positionWS = input.posWS;
+            
+                half3 viewDirWS = input.viewDir;
+                inputData.normalWS = input.normal;
+            
+                inputData.normalWS = NormalizeNormalPerPixel(inputData.normalWS);
+            
+                inputData.viewDirectionWS = viewDirWS;
+            #if defined(_MAIN_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+                inputData.shadowCoord = input.shadowCoord;
+            #else
+                inputData.shadowCoord = float4(0, 0, 0, 0);
+            #endif
+                inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
+            }
+            
+            ///////////////////////////////////////////////////////////////////////////////
+            //                  Vertex and Fragment functions                            //
+            ///////////////////////////////////////////////////////////////////////////////
+            
+            // Used in Standard (Simple Lighting) shader
+            Varyings LitPassVertexSimple(Attributes input)
+            {
+                Varyings output = (Varyings)0;
+            
+                VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
+                VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS);
+                half3 viewDirWS = GetCameraPositionWS() - vertexInput.positionWS;
+            
+                viewDirWS = SafeNormalize(viewDirWS);
+            
+                output.color = input.color;
+            
+                output.posWS = vertexInput.positionWS;
+                output.positionCS = vertexInput.positionCS;
+            
+                output.normal = normalInput.normalWS;
+                output.viewDir = viewDirWS;
+            
+                OUTPUT_SH(output.normal.xyz, output.vertexSH);
+            
+            #if defined(_MAIN_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+                output.shadowCoord = GetShadowCoord(vertexInput);
+            #endif
+            
+                return output;
+            }
+            
+            // Used for StandardSimpleLighting shader
+            half4 LitPassFragmentSimple(Varyings input) : SV_Target
+            {
+                InputDataCustom inputData;
+                InitializeInputData(input, inputData);
+            
+                //half4 color = LightweightFragmentBlinnPhong(inputData, diffuse, specularGloss, shininess, emission, alpha);
                 
-                //We need this for shadow receiving
-                TRANSFER_SHADOW(o);
-
-                return o;
-            }
+                Light mainLight = GetMainLight(inputData.shadowCoord);
+                MixRealtimeAndBakedGI(mainLight, inputData.normalWS, inputData.bakedGI, half4(0, 0, 0, 0));
             
-            half4 frag (VertexOutput i) : SV_TARGET
-            {
-                half ndotl = saturate(dot(i.normalWorld, _WorldSpaceLightPos0.xyz));
-                half shadow = SHADOW_ATTENUATION(i);
-                half3 attenuatedLightColor = (_LightColor0.rgb * ndotl) * shadow * _DiffuseContribution;
-                half3 vertexColor = lerp(half3(1,1,1), i.color, _VertexColorContribution);
-                half3 finalColor = vertexColor * (attenuatedLightColor + i.ambient);
+                half3 attenuatedLightColor = mainLight.color * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
+                half3 diffuseColor = inputData.bakedGI + LightingLambert(attenuatedLightColor, mainLight.direction, inputData.normalWS);
+            
+                half3 finalColor = diffuseColor * input.color;
+            
                 return half4(finalColor, 1);
-            }
-            ENDCG
+            };
+
+            ENDHLSL
         }
         
         // Pass to render object as a shadow caster
@@ -74,32 +153,57 @@
     
             ZWrite On ZTest LEqual Cull Off
     
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
             #pragma target 2.0
-            #pragma multi_compile_shadowcaster
-            #include "UnityCG.cginc"
-    
-            struct v2f {
-                V2F_SHADOW_CASTER;
-                UNITY_VERTEX_OUTPUT_STEREO
-            };
-    
-            v2f vert( appdata_base v )
-            {
-                v2f o;
-                UNITY_SETUP_INSTANCE_ID(v);
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-                TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
-                return o;
-            }
-    
-            float4 frag( v2f i ) : SV_Target
-            {
-                SHADOW_CASTER_FRAGMENT(i)
-            }
-            ENDCG
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature _ALPHATEST_ON
+            #pragma shader_feature _GLOSSINESS_FROM_BASE_ALPHA
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+
+            #pragma vertex ShadowPassVertex
+            #pragma fragment ShadowPassFragment
+
+            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/SimpleLitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/ShadowCasterPass.hlsl"
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "DepthOnly"
+            Tags{"LightMode" = "DepthOnly"}
+
+            ZWrite On ColorMask 0 Cull Off
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthOnlyVertex
+            #pragma fragment DepthOnlyFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature _ALPHATEST_ON
+            #pragma shader_feature _GLOSSINESS_FROM_BASE_ALPHA
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+
+            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/SimpleLitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/DepthOnlyPass.hlsl"
+            ENDHLSL
         }
     }
 }
