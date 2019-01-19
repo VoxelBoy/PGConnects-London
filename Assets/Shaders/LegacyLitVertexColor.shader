@@ -56,6 +56,9 @@
             
             half4 frag (VertexOutput i) : SV_TARGET
             {
+                //For compatibility with LWRP shader
+                i.normalWorld = normalize(i.normalWorld);
+                
                 half ndotl = saturate(dot(i.normalWorld, _WorldSpaceLightPos0.xyz));
                 half shadow = SHADOW_ATTENUATION(i);
                 half3 attenuatedLightColor = (_LightColor0.rgb * ndotl) * shadow * _DiffuseContribution;
