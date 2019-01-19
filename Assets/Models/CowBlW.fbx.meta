@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 79b1aff8ebf639a4cb45f2d50ee24baa
+guid: 33bee4529afa2d740bfcc71a4c9f1f2c
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -7,14 +7,14 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: TreePineA
+    4300000: CowBlW.001
     9500000: //RootNode
   externalObjects:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Vtx5
-    second: {fileID: 2100000, guid: d2e12f7ec38a34d7bb3ad8339c633be8, type: 2}
+      name: Material.006
+    second: {fileID: 2100000, guid: 1673db1aeeb264f8a9d4200e66f9a436, type: 2}
   materials:
     importMaterials: 0
     materialName: 0
@@ -71,7 +71,7 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
-    tangentImportMode: 3
+    tangentImportMode: 2
     normalCalculationMode: 0
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
     blendShapeNormalImportMode: 1

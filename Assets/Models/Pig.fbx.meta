@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: da7b6a5063b18ad45817f371a463f6c0
+guid: 0b54733d5329ad34db9d1e5fe04739e6
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -7,14 +7,14 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: TreeStackA
+    4300000: Pig.001
     9500000: //RootNode
   externalObjects:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: phong5
-    second: {fileID: 2100000, guid: dd3dc4c79fd8349cab0195a192677911, type: 2}
+      name: Material.008
+    second: {fileID: 2100000, guid: a212f0c79771c4653a802df8748f668c, type: 2}
   materials:
     importMaterials: 0
     materialName: 0
@@ -71,7 +71,7 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
-    tangentImportMode: 3
+    tangentImportMode: 2
     normalCalculationMode: 0
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
     blendShapeNormalImportMode: 1

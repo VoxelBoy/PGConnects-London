@@ -1,4 +1,4 @@
-﻿Shader "_Custom/Legacy/LitVertexColor"
+﻿Shader "_Custom/LWRP/LitVertexColor"
 {
     Properties
     {

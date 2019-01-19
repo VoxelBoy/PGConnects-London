@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5314096b551c13f4f8ca4c0235fc7250
+guid: 82d0b33fd2ad44744aa557711150e99e
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -7,14 +7,14 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: TreeDiamondA
+    4300000: DuckWhite.001
     9500000: //RootNode
   externalObjects:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: phong12
-    second: {fileID: 2100000, guid: d46df2dbd6d604cffad8096080e7f1a7, type: 2}
+      name: Material.007
+    second: {fileID: 2100000, guid: 7f6b948bce5384239a8fca7e18573e32, type: 2}
   materials:
     importMaterials: 0
     materialName: 0
@@ -71,7 +71,7 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
-    tangentImportMode: 3
+    tangentImportMode: 2
     normalCalculationMode: 0
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
     blendShapeNormalImportMode: 1

@@ -2,3 +2,6 @@
 /Library/*
 /.idea/*
 *.csproj
+*.sln
+/obj/*
+/Assets/Plugins*
