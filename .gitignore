@@ -5,3 +5,4 @@
 *.sln
 /obj/*
 /Assets/Plugins*
+/*DotSettings.user
