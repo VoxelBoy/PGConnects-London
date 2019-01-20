@@ -36,10 +36,7 @@ public static class CustomShortcuts
     private static void ChangeShaderOnMaterial(string shaderPath)
     {
         var mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/VertexColor.mat");
-        if (mat)
-        {
-            mat.shader = AssetDatabase.LoadAssetAtPath<Shader>(shaderPath);
-        }
+        mat.shader = AssetDatabase.LoadAssetAtPath<Shader>(shaderPath);
     }
 
     [MenuItem("Tools/Switch Render Pipeline &s")]
@@ -53,5 +50,12 @@ public static class CustomShortcuts
         {
             SwitchToBuiltInRenderer();
         }
+    }
+    
+    [MenuItem("Tools/Toggle SRP Batcher &b")]
+    private static void ToggleSRPBatcher()
+    {
+        GraphicsSettings.useScriptableRenderPipelineBatching = !GraphicsSettings.useScriptableRenderPipelineBatching;
+        GameObject.Find("Canvas/BatchText").GetComponent<TextMeshProUGUI>().enabled = GraphicsSettings.useScriptableRenderPipelineBatching;
     }
 }
