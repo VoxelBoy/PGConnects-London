@@ -1,8 +1,10 @@
 ﻿using TMPro;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.LWRP;
+using UnityEngine.SceneManagement;
 
 public static class CustomShortcuts
 {
@@ -15,7 +17,6 @@ public static class CustomShortcuts
     private static void SwitchToBuiltInRenderer()
     {
         GraphicsSettings.renderPipelineAsset = null;
-        GraphicsSettings.lightsUseLinearIntensity = false;
         ChangeShaderOnMaterial(legacyShaderPath);
         ChangeText(builtInRpText);
     }
@@ -23,14 +24,16 @@ public static class CustomShortcuts
     private static void SwitchToLWRP()
     {
         GraphicsSettings.renderPipelineAsset = AssetDatabase.LoadAssetAtPath<LightweightRenderPipelineAsset>("Assets/LightweightRenderPipelineAsset.asset");
-        GraphicsSettings.lightsUseLinearIntensity = true;
         ChangeShaderOnMaterial(lwrpShaderPath);
         ChangeText(lwrpText);
     }
 
     private static void ChangeText(string text)
     {
-        GameObject.Find("Canvas/Text")?.GetComponent<TextMeshProUGUI>().SetText(text);
+        var go = GameObject.Find("Canvas/Text");
+        go.GetComponent<TextMeshProUGUI>().SetText(text);
+        EditorUtility.SetDirty(go);
+        EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
     }
 
     private static void ChangeShaderOnMaterial(string shaderPath)
@@ -61,6 +64,10 @@ public static class CustomShortcuts
         var prop = so.FindProperty("m_UseSRPBatcher");
         prop.boolValue = !prop.boolValue;
         so.ApplyModifiedProperties();
-        GameObject.Find("Canvas/BatchText").GetComponent<TextMeshProUGUI>().enabled = prop.boolValue;
+        
+        var go = GameObject.Find("Canvas/BatchText");
+        go.GetComponent<TextMeshProUGUI>().enabled = prop.boolValue;
+        EditorUtility.SetDirty(go);
+        EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
     }
 }
