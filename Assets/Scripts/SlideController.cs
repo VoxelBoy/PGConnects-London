@@ -95,7 +95,7 @@ public class SlideController : MonoBehaviour
 		#if UNITY_EDITOR
 		if (Application.isPlaying == false)
 		{
-			UnityEditor.SceneView.onSceneGUIDelegate += OnSceneGUI;
+			UnityEditor.SceneView.duringSceneGui += DuringSceneGUI;
 			UnityEditor.EditorApplication.hierarchyChanged += OnHierarchyChanged;
 		}
 		#endif
@@ -113,7 +113,7 @@ public class SlideController : MonoBehaviour
 		#if UNITY_EDITOR
 		if (Application.isPlaying == false)
 		{
-			UnityEditor.SceneView.onSceneGUIDelegate -= OnSceneGUI;
+			UnityEditor.SceneView.duringSceneGui -= DuringSceneGUI;
 			UnityEditor.EditorApplication.hierarchyChanged -= OnHierarchyChanged;
 		}
 		#endif
@@ -195,7 +195,7 @@ public class SlideController : MonoBehaviour
 	}
 
 	#if UNITY_EDITOR
-	private void OnSceneGUI(UnityEditor.SceneView sceneview)
+	private void DuringSceneGUI(UnityEditor.SceneView sceneview)
 	{
 		DrawGUI(true);
 	}

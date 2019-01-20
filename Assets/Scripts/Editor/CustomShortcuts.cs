@@ -32,8 +32,11 @@ public static class CustomShortcuts
     {
         var go = GameObject.Find("Canvas/Text");
         go.GetComponent<TextMeshProUGUI>().SetText(text);
-        EditorUtility.SetDirty(go);
-        EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+        if (Application.isPlaying == false)
+        {
+            EditorUtility.SetDirty(go);
+            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+        }
     }
 
     private static void ChangeShaderOnMaterial(string shaderPath)
@@ -67,7 +70,11 @@ public static class CustomShortcuts
         
         var go = GameObject.Find("Canvas/BatchText");
         go.GetComponent<TextMeshProUGUI>().enabled = prop.boolValue;
-        EditorUtility.SetDirty(go);
-        EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+
+        if (Application.isPlaying == false)
+        {
+            EditorUtility.SetDirty(go);
+            EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+        }
     }
 }
