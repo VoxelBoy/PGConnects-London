@@ -1,8 +1,8 @@
 ﻿using TMPro;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering.LightweightPipeline;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.LWRP;
 
 public static class CustomShortcuts
 {
@@ -55,7 +55,12 @@ public static class CustomShortcuts
     [MenuItem("Tools/Toggle SRP Batcher &b")]
     private static void ToggleSRPBatcher()
     {
-        GraphicsSettings.useScriptableRenderPipelineBatching = !GraphicsSettings.useScriptableRenderPipelineBatching;
-        GameObject.Find("Canvas/BatchText").GetComponent<TextMeshProUGUI>().enabled = GraphicsSettings.useScriptableRenderPipelineBatching;
+        var lwrpAsset = AssetDatabase.LoadAssetAtPath<LightweightRenderPipelineAsset>("Assets/LightweightRenderPipelineAsset.asset");
+        var so = new SerializedObject(lwrpAsset);
+        so.Update();
+        var prop = so.FindProperty("m_UseSRPBatcher");
+        prop.boolValue = !prop.boolValue;
+        so.ApplyModifiedProperties();
+        GameObject.Find("Canvas/BatchText").GetComponent<TextMeshProUGUI>().enabled = prop.boolValue;
     }
 }
