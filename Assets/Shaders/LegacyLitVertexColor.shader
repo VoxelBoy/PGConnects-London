@@ -20,12 +20,14 @@
             #pragma fragment frag
             #pragma multi_compile_fwdbase
 
-            #include "Lighting.cginc"
+            #include "UnityCG.cginc"
             #include "AutoLight.cginc"
             
             fixed _AmbientContribution;
             fixed _DiffuseContribution;
             fixed _VertexColorContribution;
+            
+            fixed4 _LightColor0;
             
             struct VertexOutput
             {
@@ -33,7 +35,7 @@
                 half3 normalWorld : TEXCOORD1;
                 fixed3 ambient : TEXCOORD2;
                 half4 color : COLOR;
-                LIGHTING_COORDS(3,4)
+                SHADOW_COORDS(3)
             };
             
             VertexOutput vert (appdata_full v)
