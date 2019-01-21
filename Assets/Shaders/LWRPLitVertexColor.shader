@@ -12,7 +12,7 @@
 
         Pass
         {
-            Name "ForwardLit"
+            Name "FORWARD"
             Tags { "LightMode" = "LightweightForward" }
 
             HLSLPROGRAM
@@ -30,9 +30,11 @@
 
             #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Lighting.hlsl"
             
-            half _AmbientContribution;
-            half _DiffuseContribution;
-            half _VertexColorContribution;
+            CBUFFER_START(UnityPerMaterial)
+                half _AmbientContribution;
+                half _DiffuseContribution;
+                half _VertexColorContribution;
+            CBUFFER_END
             
             struct Attributes
             {
@@ -45,16 +47,11 @@
             {
                 float3 color                    : COLOR;
                 half3 vertexSH                  : TEXCOORD1;
-                half3 normal                   : TEXCOORD2;
+                half3 normalWS                   : TEXCOORD2;
                 float4 shadowCoord              : TEXCOORD3;
                 float4 positionCS               : SV_POSITION;
             };
             
-            ///////////////////////////////////////////////////////////////////////////////
-            //                  Vertex and Fragment functions                            //
-            ///////////////////////////////////////////////////////////////////////////////
-            
-            // Used in Standard (Simple Lighting) shader
             Varyings LitPassVertexSimple(Attributes input)
             {
                 Varyings output = (Varyings)0;
@@ -62,25 +59,23 @@
                 VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
                 VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS);
             
-                output.color = input.color;
                 output.positionCS = vertexInput.positionCS;
-                output.normal = normalInput.normalWS;
-                OUTPUT_SH(output.normal.xyz, output.vertexSH);
+                output.normalWS = normalInput.normalWS;
+                output.color = input.color;
+                OUTPUT_SH(output.normalWS.xyz, output.vertexSH);
                 output.shadowCoord = GetShadowCoord(vertexInput);
             
                 return output;
             }
             
-            // Used for StandardSimpleLighting shader
             half4 LitPassFragmentSimple(Varyings input) : SV_Target
             {
-                half3 normalWS = NormalizeNormalPerPixel(input.normal);
-                half3 bakedGI = SampleSHPixel(input.vertexSH, normalWS) * _AmbientContribution;
+                half3 normalWS = NormalizeNormalPerPixel(input.normalWS);
+                half3 ambient = SampleSHPixel(input.vertexSH, normalWS) * _AmbientContribution;
             
                 Light mainLight = GetMainLight(input.shadowCoord);
                 half3 attenuatedLightColor = mainLight.color * mainLight.shadowAttenuation * _DiffuseContribution;
-                half3 diffuseColor = bakedGI + LightingLambert(attenuatedLightColor, mainLight.direction, normalWS);
-            
+                half3 diffuseColor = ambient + LightingLambert(attenuatedLightColor, mainLight.direction, normalWS);
                 half3 vertexColor = lerp(half3(1,1,1), input.color, _VertexColorContribution);
                 
                 half3 finalColor = diffuseColor * vertexColor;
@@ -91,6 +86,7 @@
         }
         
         // Pass to render object as a shadow caster
+        // NOTE: Pulled in ShadowCasterPass.hlsl code here to get rid of usage of MainTex 
         Pass
         {
             Name "ShadowCaster"
@@ -99,6 +95,7 @@
             ZWrite On ZTest LEqual Cull Off
     
             HLSLPROGRAM
+            
             // Required to compile gles 2.0 with standard srp library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
@@ -107,8 +104,50 @@
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
 
-            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/SimpleLitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.lightweight/Shaders/ShadowCasterPass.hlsl"
+            #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/SurfaceInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Shadows.hlsl"
+            
+            float3 _LightDirection;
+            
+            struct Attributes
+            {
+                float4 positionOS   : POSITION;
+                float3 normalOS     : NORMAL;
+            };
+            
+            struct Varyings
+            {
+                float4 positionCS   : SV_POSITION;
+            };
+            
+            float4 GetShadowPositionHClip(Attributes input)
+            {
+                float3 positionWS = TransformObjectToWorld(input.positionOS.xyz);
+                float3 normalWS = TransformObjectToWorldDir(input.normalOS);
+            
+                float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _LightDirection));
+            
+            #if UNITY_REVERSED_Z
+                positionCS.z = min(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+            #else
+                positionCS.z = max(positionCS.z, positionCS.w * UNITY_NEAR_CLIP_VALUE);
+            #endif
+            
+                return positionCS;
+            }
+            
+            Varyings ShadowPassVertex(Attributes input)
+            {
+                Varyings output;
+                output.positionCS = GetShadowPositionHClip(input);
+                return output;
+            }
+            
+            half4 ShadowPassFragment(Varyings input) : SV_TARGET
+            {
+                return 0;
+            }
             ENDHLSL
         }
     }

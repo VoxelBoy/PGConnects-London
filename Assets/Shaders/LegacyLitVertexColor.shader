@@ -40,18 +40,13 @@
             
             VertexOutput vert (appdata_full v)
             {
-                VertexOutput o;
-                UNITY_INITIALIZE_OUTPUT(VertexOutput, o);
+                VertexOutput o = (VertexOutput)0;
             
-                float4 posWorld = mul(unity_ObjectToWorld, v.vertex);
                 o.pos = UnityObjectToClipPos(v.vertex);
                 o.normalWorld = UnityObjectToWorldNormal(v.normal);
-            
-                o.ambient = ShadeSH9 (float4(o.normalWorld,1.0)) * _AmbientContribution;
                 o.color = v.color;
-                
-                //We need this for shadow receiving
                 TRANSFER_SHADOW(o);
+                o.ambient = ShadeSH9 (float4(o.normalWorld,1.0)) * _AmbientContribution;
 
                 return o;
             }
@@ -59,13 +54,14 @@
             half4 frag (VertexOutput i) : SV_TARGET
             {
                 //For compatibility with LWRP shader
-                i.normalWorld = normalize(i.normalWorld);
+                half3 normalWS = normalize(i.normalWorld);
                 
-                half ndotl = saturate(dot(i.normalWorld, _WorldSpaceLightPos0.xyz));
-                half shadow = SHADOW_ATTENUATION(i);
-                half3 attenuatedLightColor = (_LightColor0.rgb * ndotl) * shadow * _DiffuseContribution;
+                half ndotl = saturate(dot(normalWS, _WorldSpaceLightPos0.xyz));
+                half3 attenuatedLightColor = (_LightColor0.rgb * ndotl) * SHADOW_ATTENUATION(i) * _DiffuseContribution;
+                half3 diffuseColor = i.ambient + attenuatedLightColor;
                 half3 vertexColor = lerp(half3(1,1,1), i.color, _VertexColorContribution);
-                half3 finalColor = vertexColor * (attenuatedLightColor + i.ambient);
+                
+                half3 finalColor = diffuseColor * vertexColor;
                 return half4(finalColor, 1);
             }
             ENDCG
