@@ -25,7 +25,7 @@ The presentation slides can be viewed in the Unity project in this repository.
 * Customizing render pipelines and renderer
 
 #### Scriptable Render Pipeline tutorials by Catlike Coding
-* [Website](https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/)
+* [Tutorials page](https://catlikecoding.com/unity/tutorials/scriptable-render-pipeline/)
 
 #### Extending LWRP
 * [GitHub repository](https://github.com/johnsietsma/ExtendingLWRP)
