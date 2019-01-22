@@ -8,11 +8,8 @@
     }
     SubShader
     {
-        Tags { "RenderType" = "Opaque" }
-
         Pass
         {
-            Name "FORWARD"
             Tags { "LightMode" = "ForwardBase" }
             
             CGPROGRAM
@@ -23,43 +20,49 @@
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
             
-            fixed _AmbientContribution;
-            fixed _DiffuseContribution;
-            fixed _VertexColorContribution;
+            half _AmbientContribution;
+            half _DiffuseContribution;
+            half _VertexColorContribution;
             
-            fixed4 _LightColor0;
+            half4 _LightColor0;
             
-            struct VertexOutput
+            struct Attributes
             {
-                UNITY_POSITION(pos);
-                half3 normalWorld : TEXCOORD1;
-                fixed3 ambient : TEXCOORD2;
-                half4 color : COLOR;
-                SHADOW_COORDS(3)
+                float4 positionOS    : POSITION;
+                float3 normalOS      : NORMAL;
+                float4 color         : COLOR;
             };
             
-            VertexOutput vert (appdata_full v)
+            struct Varyings
             {
-                VertexOutput o = (VertexOutput)0;
+                half4 color          : COLOR;
+                half3 vertexSH       : TEXCOORD1;
+                half3 normalWS       : TEXCOORD2;
+                float4 _ShadowCoord  : TEXCOORD3;
+                float4 pos           : SV_POSITION;
+            };
             
-                o.pos = UnityObjectToClipPos(v.vertex);
-                o.normalWorld = UnityObjectToWorldNormal(v.normal);
-                o.color = v.color;
-                TRANSFER_SHADOW(o);
-                o.ambient = ShadeSH9 (float4(o.normalWorld,1.0)) * _AmbientContribution;
+            Varyings vert (Attributes input)
+            {
+                Varyings output = (Varyings)0;
+            
+                output.pos = UnityObjectToClipPos(input.positionOS);
+                output.normalWS = UnityObjectToWorldNormal(input.normalOS);
+                output.color = input.color;
+                TRANSFER_SHADOW(output);
+                output.vertexSH = ShadeSH9 (float4(output.normalWS,1.0)) * _AmbientContribution;
 
-                return o;
+                return output;
             }
             
-            half4 frag (VertexOutput i) : SV_TARGET
+            half4 frag (Varyings input) : SV_TARGET
             {
-                //For compatibility with LWRP shader
-                half3 normalWS = normalize(i.normalWorld);
+                half3 normalWS = normalize(input.normalWS);
                 
                 half ndotl = saturate(dot(normalWS, _WorldSpaceLightPos0.xyz));
-                half3 attenuatedLightColor = (_LightColor0.rgb * ndotl) * SHADOW_ATTENUATION(i) * _DiffuseContribution;
-                half3 diffuseColor = i.ambient + attenuatedLightColor;
-                half3 vertexColor = lerp(half3(1,1,1), i.color, _VertexColorContribution);
+                half3 attenuatedLightColor = _LightColor0.rgb * ndotl * SHADOW_ATTENUATION(input) * _DiffuseContribution;
+                half3 diffuseColor = input.vertexSH + attenuatedLightColor;
+                half3 vertexColor = lerp(half3(1,1,1), input.color, _VertexColorContribution);
                 
                 half3 finalColor = diffuseColor * vertexColor;
                 return half4(finalColor, 1);

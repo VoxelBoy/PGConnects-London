@@ -8,12 +8,9 @@
     }
     SubShader
     {
-        Tags { "RenderType" = "Opaque" "RenderPipeline" = "LightweightPipeline"}
-
         Pass
         {
-            Name "FORWARD"
-            Tags { "LightMode" = "LightweightForward" }
+            Tags {"RenderPipeline" = "LightweightPipeline" "LightMode" = "LightweightForward" }
 
             HLSLPROGRAM
             // Required to compile gles 2.0 with standard srp library
@@ -45,11 +42,11 @@
             
             struct Varyings
             {
-                float3 color                    : COLOR;
-                half3 vertexSH                  : TEXCOORD1;
-                half3 normalWS                   : TEXCOORD2;
-                float4 shadowCoord              : TEXCOORD3;
-                float4 positionCS               : SV_POSITION;
+                float3 color         : COLOR;
+                half3 vertexSH       : TEXCOORD1;
+                half3 normalWS       : TEXCOORD2;
+                float4 shadowCoord   : TEXCOORD3;
+                float4 positionCS    : SV_POSITION;
             };
             
             Varyings LitPassVertexSimple(Attributes input)
@@ -74,8 +71,9 @@
                 half3 ambient = SampleSHPixel(input.vertexSH, normalWS) * _AmbientContribution;
             
                 Light mainLight = GetMainLight(input.shadowCoord);
-                half3 attenuatedLightColor = mainLight.color * mainLight.shadowAttenuation * _DiffuseContribution;
-                half3 diffuseColor = ambient + LightingLambert(attenuatedLightColor, mainLight.direction, normalWS);
+                half ndotl = saturate(dot(normalWS, mainLight.direction));
+                half3 attenuatedLightColor = mainLight.color * ndotl * mainLight.shadowAttenuation * _DiffuseContribution;
+                half3 diffuseColor = ambient + attenuatedLightColor;
                 half3 vertexColor = lerp(half3(1,1,1), input.color, _VertexColorContribution);
                 
                 half3 finalColor = diffuseColor * vertexColor;
