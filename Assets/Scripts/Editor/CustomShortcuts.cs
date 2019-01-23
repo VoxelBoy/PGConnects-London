@@ -10,6 +10,7 @@ public static class CustomShortcuts
 {
     private const string legacyShaderPath = "Assets/Shaders/LegacyLitVertexColor.shader";
     private const string lwrpShaderPath = "Assets/Shaders/LWRPLitVertexColor.shader";
+    private const string lwrpGraphShaderPath = "Assets/Shaders/LWRPLitVertexColor_graph.shadergraph";
 
     private const string builtInRpText = "Built-In RP";
     private const string lwrpText = "LWRP";
@@ -42,7 +43,14 @@ public static class CustomShortcuts
     private static void ChangeShaderOnMaterial(string shaderPath)
     {
         var mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/Materials/VertexColor.mat");
-        mat.shader = AssetDatabase.LoadAssetAtPath<Shader>(shaderPath);
+        var shader = AssetDatabase.LoadAssetAtPath<Shader>(shaderPath);
+        if (shader == null && shaderPath == lwrpShaderPath)
+        {
+            //Try loading fallback lwrp shader
+            shader = AssetDatabase.LoadAssetAtPath<Shader>(lwrpGraphShaderPath);
+        }
+
+        mat.shader = shader;
     }
 
     [MenuItem("Tools/Switch Render Pipeline &s")]
